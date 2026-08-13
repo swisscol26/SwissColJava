@@ -1,0 +1,9 @@
+EVIDENCIA FRONT-END REACT
+Módulo administrativo CRUD de productos
+
+Aprendiz: Marlon Pulido
+Repositorio GitHub:
+https://github.com/swisscol26/SwissColJava
+
+El código del proyecto React se encuentra en la carpeta:
+frontend-productos
