@@ -44,8 +44,35 @@ function ProductosPage() {
    * useEffect ejecuta la consulta al abrir la pantalla.
    */
   useEffect(() => {
-    cargarProductos();
-  }, []);
+  let componenteActivo = true;
+
+  productoService
+    .listarProductos()
+    .then((respuesta) => {
+      if (componenteActivo) {
+        setProductos(respuesta.data);
+      }
+    })
+    .catch((err) => {
+      console.error("Error al cargar productos:", err);
+
+      if (componenteActivo) {
+        setError(
+          "No fue posible cargar los productos. " +
+            "Comprueba que la API Java esté ejecutándose."
+        );
+      }
+    })
+    .finally(() => {
+      if (componenteActivo) {
+        setCargando(false);
+      }
+    });
+
+  return () => {
+    componenteActivo = false;
+  };
+}, []);
 
   /**
    * Solicita confirmación y elimina el producto.
