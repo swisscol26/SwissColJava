@@ -1,0 +1,12 @@
+# Archivos compilados de Java
+/bin/
+*.class
+
+# Archivos generados por React
+/frontend-productos/node_modules/
+/frontend-productos/dist/
+
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example
