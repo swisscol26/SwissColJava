@@ -1,16 +1,95 @@
-# React + Vite
+# CRUD administrativo de productos — Swisscol
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Proyecto front-end desarrollado en React para administrar los productos del sistema Swisscol. Permite consultar, registrar, visualizar, actualizar y eliminar productos mediante una API Java conectada con MySQL.
 
-Currently, two official plugins are available:
+## Tecnologías utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React con Vite
+- React Router DOM
+- Axios
+- Bootstrap
+- Java HttpServer
+- Gson
+- MySQL
+- Git y GitHub
 
-## React Compiler
+## Funcionalidades
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Listado y búsqueda de productos.
+- Registro de productos.
+- Consulta individual de productos.
+- Actualización de productos.
+- Eliminación con confirmación.
+- Validación de formularios.
+- Navegación sin recargar la página.
+- Mensajes de carga, éxito y error.
 
-## Expanding the ESLint configuration
+## Hooks utilizados
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `useState`: manejo de formularios, tablas, carga y mensajes.
+- `useEffect`: consulta de datos al iniciar las pantallas.
+- `useNavigate`: navegación entre las páginas.
+- `useParams`: lectura del identificador incluido en las rutas.
+
+## Rutas del módulo
+
+- `/admin/productos`: listado de productos.
+- `/admin/productos/nuevo`: registro de productos.
+- `/admin/productos/:productId`: detalle de un producto.
+- `/admin/productos/:productId/editar`: edición de un producto.
+
+## Estructura principal
+
+```text
+src/
+├── components/
+│   └── productos/
+├── pages/
+│   └── productos/
+├── services/
+├── assets/
+├── App.jsx
+└── main.jsx
+```
+
+## Requisitos
+
+- Node.js y npm.
+- Java JDK.
+- MySQL.
+- Base de datos `database_swisscol`.
+- Variable de entorno `SWISSCOL_DB_PASSWORD`.
+
+## Ejecución
+
+1. Iniciar MySQL.
+2. Ejecutar `ProductoApi.java`.
+3. Abrir una terminal dentro de `frontend-productos`.
+4. Instalar las dependencias:
+
+```bash
+npm install
+```
+
+5. Iniciar React:
+
+```bash
+npm run dev
+```
+
+6. Abrir `http://localhost:5173/admin/productos`.
+
+## Verificación
+
+```bash
+npm run lint
+npm run build
+```
+
+## Repositorio
+
+https://github.com/swisscol26/SwissColJava
+
+## Autor
+
+Marlon Pulido — Programa ADSO, SENA.
