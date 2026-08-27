@@ -93,8 +93,31 @@ Durante las pruebas se verificaron las siguientes medidas:
 
 ## Evidencia visual
 
-![Resultado de las pruebas de autenticación](evidencias/EV02/capturas/01_resultado_runner_autenticacion.png)
+## Evidencia visual
 
+### Resultado general de la colección
+
+![Resultado general del Runner](evidencias/EV02/capturas/01_resultado_runner_autenticacion.png)
+
+### Registro exitoso — 201 Created
+
+![Registro exitoso](evidencias/EV02/capturas/02_registro_exitoso.png)
+
+### Registro con contraseñas diferentes — 400 Bad Request
+
+![Registro con contraseñas diferentes](evidencias/EV02/capturas/03_registro_contrasenas_diferentes.png)
+
+### Registro con correo duplicado — 409 Conflict
+
+![Registro con correo duplicado](evidencias/EV02/capturas/04_registro_correo_duplicado.png)
+
+### Inicio de sesión exitoso — 200 OK
+
+![Inicio de sesión exitoso](evidencias/EV02/capturas/05_login_exitoso.png)
+
+### Inicio de sesión con contraseña incorrecta — 401 Unauthorized
+
+![Inicio de sesión con contraseña incorrecta](evidencias/EV02/capturas/06_login_contrasena_incorrecta.png)
 ## Conclusión
 
 La API de autenticación de Swisscol cumple con las funciones de registro e inicio de sesión. Los cinco escenarios evaluados respondieron con los códigos HTTP y mensajes esperados. Las veinte validaciones automatizadas fueron aprobadas y no se presentaron errores durante la ejecución de la colección.
