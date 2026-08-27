@@ -1,0 +1,339 @@
+{
+  "info": {
+    "_postman_id": "f42c2b24-02ce-46bb-83e8-d5047b8c3dc2",
+    "name": "Swisscol - Autenticación",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57750007",
+    "_collection_link": "https://go.postman.co/collection/57750007-f42c2b24-02ce-46bb-83e8-d5047b8c3dc2?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Registro exitoso",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const respuesta = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Estado HTTP 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Registro exitoso\", function () {\r",
+              "    pm.expect(respuesta.exito).to.eql(true);\r",
+              "    pm.expect(respuesta.mensaje)\r",
+              "        .to.eql(\"Usuario registrado correctamente.\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Devuelve los datos del nuevo usuario\", function () {\r",
+              "    pm.expect(respuesta).to.have.property(\"usuarioId\");\r",
+              "    pm.expect(respuesta.correo)\r",
+              "        .to.eql(pm.variables.get(\"correo_prueba\"));\r",
+              "    pm.expect(respuesta.rol).to.eql(\"CUSTOMER\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"No expone la contraseña\", function () {\r",
+              "    pm.expect(respuesta).to.not.have.property(\"password\");\r",
+              "    pm.expect(respuesta).to.not.have.property(\"passwordHash\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const correoPrueba = `evidencia.${Date.now()}@swisscol.com`;\r",
+              "\r",
+              "pm.variables.set(\"correo_prueba\", correoPrueba);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"nombre\": \"Usuario Evidencia\",\n    \"correo\": \"{{correo_prueba}}\",\n    \"password\": \"ClaveSegura123\",\n    \"confirmarPassword\": \"ClaveSegura123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/registro",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Registro con contraseñas diferentes",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const respuesta = pm.response.json();",
+              "",
+              "pm.test(\"Estado HTTP 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Registro rechazado\", function () {",
+              "    pm.expect(respuesta.exito).to.eql(false);",
+              "});",
+              "",
+              "pm.test(\"Mensaje de contraseñas diferentes\", function () {",
+              "    pm.expect(respuesta.mensaje)",
+              "        .to.eql(\"Las contraseñas no coinciden.\");",
+              "});",
+              "",
+              "pm.test(\"No crea ningún usuario\", function () {",
+              "    pm.expect(respuesta).to.not.have.property(\"usuarioId\");",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Otro Usuario\",\n  \"correo\": \"otro.usuario@swisscol.com\",\n  \"password\": \"ClaveSegura123\",\n  \"confirmarPassword\": \"ClaveDiferente123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/registro",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Registro con correo duplicado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const respuesta = pm.response.json();",
+              "",
+              "pm.test(\"Estado HTTP 409\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test(\"Registro rechazado\", function () {",
+              "    pm.expect(respuesta.exito).to.eql(false);",
+              "});",
+              "",
+              "pm.test(\"Mensaje de correo duplicado\", function () {",
+              "    pm.expect(respuesta.mensaje)",
+              "        .to.eql(\"El correo ya está registrado.\");",
+              "});",
+              "",
+              "pm.test(\"No crea un nuevo usuario\", function () {",
+              "    pm.expect(respuesta).to.not.have.property(\"usuarioId\");",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Usuario Evidencia\",\n  \"correo\": \"evidencia.registro@swisscol.com\",\n  \"password\": \"ClaveSegura123\",\n  \"confirmarPassword\": \"ClaveSegura123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/registro",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Login exitoso",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const respuesta = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Estado HTTP 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Inicio de sesión exitoso\", function () {\r",
+              "    pm.expect(respuesta.exito).to.eql(true);\r",
+              "    pm.expect(respuesta.mensaje)\r",
+              "        .to.eql(\"Inicio de sesión exitoso.\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Devuelve los datos del usuario\", function () {\r",
+              "    pm.expect(respuesta).to.have.property(\"usuarioId\");\r",
+              "    pm.expect(respuesta).to.have.property(\"nombre\");\r",
+              "    pm.expect(respuesta).to.have.property(\"correo\");\r",
+              "    pm.expect(respuesta).to.have.property(\"rol\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"No expone la contraseña\", function () {\r",
+              "    pm.expect(respuesta).to.not.have.property(\"password\");\r",
+              "    pm.expect(respuesta).to.not.have.property(\"passwordHash\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"correo\": \"evidencia.registro@swisscol.com\",\r\n  \"password\": \"ClaveSegura123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login con contraseña incorrecta",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const respuesta = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Estado HTTP 401\", function () {\r",
+              "    pm.response.to.have.status(401);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Inicio de sesión rechazado\", function () {\r",
+              "    pm.expect(respuesta.exito).to.eql(false);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Mensaje de credenciales incorrectas\", function () {\r",
+              "    pm.expect(respuesta.mensaje)\r",
+              "        .to.eql(\"Correo o contraseña incorrectos.\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"No devuelve datos del usuario\", function () {\r",
+              "    pm.expect(respuesta)\r",
+              "        .to.not.have.property(\"usuarioId\");\r",
+              "\r",
+              "    pm.expect(respuesta)\r",
+              "        .to.not.have.property(\"password\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"correo\": \"evidencia.registro@swisscol.com\",\r\n  \"password\": \"ClaveIncorrecta\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    }
+  ]
+}
