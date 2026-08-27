@@ -46,7 +46,7 @@ public class ProductoApi {
     /**
      * Atiende las solicitudes HTTP del CRUD de productos.
      */
-    private static void manejarPeticion(HttpExchange exchange)
+    public static void manejarPeticion(HttpExchange exchange)
             throws IOException {
 
         configurarCors(exchange);
