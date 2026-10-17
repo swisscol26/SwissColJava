@@ -1,5 +1,19 @@
 # Publicación académica en Render
 
+## Certificado Aiven
+
+El certificado público `certs/aiven-ca.pem` del proyecto Aiven se importa al almacén
+de confianza de Java durante la construcción. No contiene claves privadas ni la
+contraseña MySQL. La conexión debe usar `sslMode=VERIFY_IDENTITY` para verificar
+tanto la CA como el nombre del servidor. Si cambia la CA de Aiven, reemplazar este
+archivo y reconstruir la imagen. No se modifica el almacén de Java del equipo local.
+
+URL JDBC para este servicio (sin contraseña):
+
+```text
+jdbc:mysql://mysql-378294b6-swisscol-demo.e.aivencloud.com:14137/database_swisscol?sslMode=VERIFY_IDENTITY&serverTimezone=America/Bogota
+```
+
 ## Preparación al 17 de octubre de 2026
 
 El Dockerfile construye Java 21 y el panel React en Render. Descarga la tienda pública

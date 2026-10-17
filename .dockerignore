@@ -1,5 +1,7 @@
 **
 !Dockerfile
+!certs/
+!certs/aiven-ca.pem
 !src/
 !src/**
 !lib/

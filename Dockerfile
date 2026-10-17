@@ -22,6 +22,10 @@ RUN mkdir classes && find src -name '*.java' > sources.txt \
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
+COPY certs/aiven-ca.pem /app/certs/aiven-ca.pem
+# Certificado publico del proyecto Aiven; no contiene claves ni contrasenas.
+RUN keytool -importcert -noprompt -cacerts -storepass changeit \
+    -alias swisscol-aiven -file /app/certs/aiven-ca.pem
 COPY --from=java /build/classes/ classes/
 COPY --from=java /build/lib/ lib/
 COPY --from=tienda /tienda/index.html web/index.html
