@@ -1,34 +1,33 @@
+import { API_BASE } from "../config";
 import axios from "axios";
 
-// Dirección de la API Java del módulo de productos.
-const API_URL = "http://localhost:8080/api/productos";
+const apiProductos = axios.create({
+    baseURL:
+        `${API_BASE}/productos`,
+    withCredentials: true
+});
 
 const productoService = {
 
-  // Obtiene todos los productos.
-  listarProductos() {
-    return axios.get(API_URL);
-  },
+    listarProductos() {
+        return apiProductos.get("");
+    },
 
-  // Busca un producto por su ID.
-  buscarProductoPorId(productId) {
-    return axios.get(`${API_URL}/${productId}`);
-  },
+    buscarProductoPorId(productId) {
+        return apiProductos.get(`/${productId}`);
+    },
 
-  // Registra un producto nuevo.
-  registrarProducto(producto) {
-    return axios.post(API_URL, producto);
-  },
+    registrarProducto(producto) {
+        return apiProductos.post("", producto);
+    },
 
-  // Actualiza un producto existente.
-  actualizarProducto(productId, producto) {
-    return axios.put(`${API_URL}/${productId}`, producto);
-  },
+    actualizarProducto(productId, producto) {
+        return apiProductos.put(`/${productId}`, producto);
+    },
 
-  // Elimina un producto.
-  eliminarProducto(productId) {
-    return axios.delete(`${API_URL}/${productId}`);
-  },
+    eliminarProducto(productId) {
+        return apiProductos.delete(`/${productId}`);
+    }
 };
 
 export default productoService;

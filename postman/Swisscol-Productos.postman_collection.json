@@ -1,0 +1,778 @@
+{
+  "info": {
+    "_postman_id": "44fa29f7-4bcf-4970-a856-8c2cd619b5a8",
+    "name": "Swisscol - API de productos",
+    "description": "Colección de pruebas positivas y negativas del CRUD de productos desarrollado para las evidencias GA7-220501096-AA5-EV03 y GA7-220501096-AA5-EV04.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Casos exitosos",
+      "item": [
+        {
+          "name": "Listar productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve una lista\", function () {",
+                  "    pm.expect(respuesta).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"La lista contiene productos\", function () {",
+                  "    pm.expect(respuesta.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba listar productos de la API de productos de Swisscol."
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar producto existente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el producto solicitado\", function () {",
+                  "    pm.expect(respuesta.productId)",
+                  "        .to.eql(Number(pm.environment.get(\"producto_existente_id\")));",
+                  "});",
+                  "",
+                  "pm.test(\"Incluye los campos principales\", function () {",
+                  "    pm.expect(respuesta).to.have.all.keys(",
+                  "        \"productId\", \"name\", \"description\",",
+                  "        \"price\", \"stock\", \"image\", \"categoryId\"",
+                  "    );",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/productos/{{producto_existente_id}}",
+            "description": "Prueba consultar producto existente de la API de productos de Swisscol."
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Registro exitoso\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(true);",
+                  "    pm.expect(respuesta.mensaje)",
+                  "        .to.eql(\"Producto registrado correctamente.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el producto creado\", function () {",
+                  "    pm.expect(respuesta.producto.productId)",
+                  "        .to.eql(Number(pm.collectionVariables.get(\"producto_prueba_id\")));",
+                  "    pm.expect(respuesta.producto.name)",
+                  "        .to.eql(\"Victorinox Postman EV04\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const productoId = 900000000 + (Date.now() % 90000000);",
+                  "pm.collectionVariables.set(\"producto_prueba_id\", productoId);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba registrar producto de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{producto_prueba_id}},\n  \"name\": \"Victorinox Postman EV04\",\n  \"description\": \"Producto temporal creado por el Runner\",\n  \"price\": 189900,\n  \"stock\": 25,\n  \"image\": \"postman-ev04.jpg\",\n  \"categoryId\": {{categoria_existente_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Actualización exitosa\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(true);",
+                  "    pm.expect(respuesta.mensaje)",
+                  "        .to.eql(\"Producto actualizado correctamente.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve los datos actualizados\", function () {",
+                  "    pm.expect(respuesta.producto.name)",
+                  "        .to.eql(\"Victorinox Postman Actualizado\");",
+                  "    pm.expect(respuesta.producto.stock).to.eql(30);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos/{{producto_prueba_id}}",
+            "description": "Prueba actualizar producto de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Victorinox Postman Actualizado\",\n  \"description\": \"Producto actualizado por el Runner\",\n  \"price\": 209900,\n  \"stock\": 30,\n  \"image\": \"postman-actualizado.jpg\",\n  \"categoryId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar producto actualizado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Conserva el ID del producto\", function () {",
+                  "    pm.expect(respuesta.productId)",
+                  "        .to.eql(Number(pm.collectionVariables.get(\"producto_prueba_id\")));",
+                  "});",
+                  "",
+                  "pm.test(\"La actualización quedó almacenada\", function () {",
+                  "    pm.expect(respuesta.name)",
+                  "        .to.eql(\"Victorinox Postman Actualizado\");",
+                  "    pm.expect(respuesta.price).to.eql(209900);",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/productos/{{producto_prueba_id}}",
+            "description": "Prueba consultar producto actualizado de la API de productos de Swisscol."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Eliminación exitosa\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(true);",
+                  "    pm.expect(respuesta.mensaje)",
+                  "        .to.eql(\"Producto eliminado correctamente.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Informa el producto eliminado\", function () {",
+                  "    pm.expect(respuesta.producto.productId)",
+                  "        .to.eql(Number(pm.collectionVariables.get(\"producto_prueba_id\")));",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/productos/{{producto_prueba_id}}",
+            "description": "Prueba eliminar producto de la API de productos de Swisscol."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Casos de error",
+      "item": [
+        {
+          "name": "Consultar con ID no numérico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"El ID debe ser un número entero válido.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/productos/abc",
+            "description": "Prueba consultar con id no numérico de la API de productos de Swisscol."
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar producto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"Producto no encontrado.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/productos/{{producto_inexistente_id}}",
+            "description": "Prueba consultar producto inexistente de la API de productos de Swisscol."
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar ID duplicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"Ya existe un producto con ese ID.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba registrar id duplicado de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{producto_existente_id}},\n  \"name\": \"Producto duplicado\",\n  \"description\": \"Debe ser rechazado\",\n  \"price\": 100000,\n  \"stock\": 5,\n  \"image\": \"duplicado.jpg\",\n  \"categoryId\": {{categoria_existente_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar precio negativo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"El precio debe ser mayor que cero.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba registrar precio negativo de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{producto_prueba_id}},\n  \"name\": \"Producto inválido\",\n  \"description\": \"Precio negativo\",\n  \"price\": -1,\n  \"stock\": 5,\n  \"image\": \"invalido.jpg\",\n  \"categoryId\": {{categoria_existente_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar categoría inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"La categoría indicada no existe.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba registrar categoría inexistente de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{producto_prueba_id}},\n  \"name\": \"Producto sin categoría\",\n  \"description\": \"Categoría inexistente\",\n  \"price\": 120000,\n  \"stock\": 5,\n  \"image\": \"categoria-error.jpg\",\n  \"categoryId\": {{categoria_inexistente_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar producto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"Producto no encontrado.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos/{{producto_inexistente_id}}",
+            "description": "Prueba actualizar producto inexistente de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Producto inexistente\",\n  \"description\": \"No debe actualizarse\",\n  \"price\": 150000,\n  \"stock\": 10,\n  \"image\": \"inexistente.jpg\",\n  \"categoryId\": {{categoria_existente_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar producto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"Producto no encontrado.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/api/productos/{{producto_prueba_id}}",
+            "description": "Prueba eliminar producto inexistente de la API de productos de Swisscol."
+          },
+          "response": []
+        },
+        {
+          "name": "Utilizar método no permitido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 405\", function () {",
+                  "    pm.response.to.have.status(405);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"Método no permitido.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba utilizar método no permitido de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar Content-Type incorrecto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const respuesta = pm.response.json();",
+                  "",
+                  "pm.test(\"Estado HTTP 415\", function () {",
+                  "    pm.response.to.have.status(415);",
+                  "});",
+                  "",
+                  "pm.test(\"La operación es rechazada\", function () {",
+                  "    pm.expect(respuesta.exito).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Devuelve el mensaje esperado\", function () {",
+                  "    pm.expect(respuesta.mensaje).to.eql(\"El Content-Type debe ser application/json.\");",
+                  "});",
+                  "",
+                  "pm.test(\"Respuesta en formato JSON\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+                  "        .to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/plain",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/productos",
+            "description": "Prueba enviar content-type incorrecto de la API de productos de Swisscol.",
+            "body": {
+              "mode": "raw",
+              "raw": "contenido sin formato JSON",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "producto_prueba_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

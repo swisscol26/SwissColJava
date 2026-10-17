@@ -3,6 +3,7 @@ package routes;
 import com.sun.net.httpserver.HttpServer;
 
 import controllers.AuthController;
+import services.AutorizacionService;
 
 public final class AuthRoutes {
 
@@ -24,5 +25,21 @@ public final class AuthRoutes {
             "/api/auth/login",
             AuthController::iniciarSesion
         );
+
+        servidor.createContext(
+            "/api/auth/logout",
+            AuthController::cerrarSesion
+        );
+
+        servidor.createContext(
+            "/api/auth/sesion",
+            AuthController::verificarSesion
+        );
+
+        servidor.createContext(
+            "/api/auth/admin",
+            AuthController::verificarAdministrador
+        );
+
     }
 }

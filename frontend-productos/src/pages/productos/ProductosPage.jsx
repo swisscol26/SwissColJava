@@ -134,15 +134,31 @@ function ProductosPage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={() =>
-            navigate("/admin/productos/nuevo")
-          }
-        >
-          Registrar producto
-        </button>
+          <div className="d-flex flex-wrap gap-2">
+      <button
+        type="button"
+        className="btn btn-outline-primary"
+        onClick={() => navigate("/admin/pedidos")}
+      >
+        Pedidos pendientes
+      </button>
+
+      <button
+        type="button"
+        className="btn btn-outline-success"
+        onClick={() => navigate("/admin/estadisticas")}
+      >
+        Estadísticas
+      </button>
+
+      <button
+        type="button"
+        className="btn btn-danger"
+        onClick={() => navigate("/admin/productos/nuevo")}
+      >
+        Registrar producto
+      </button>
+    </div>
       </div>
 
       {mensaje && (

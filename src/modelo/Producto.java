@@ -6,9 +6,14 @@ public class Producto {
     private String name;
     private String description;
     private double price;
+    private Double offerPrice;
     private int stock;
     private String image;
     private int categoryId;
+    private String technicalDetails;
+    private String reference;
+    private int availableStock;
+
 
     public Producto() {
     }
@@ -80,4 +85,36 @@ public class Producto {
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
+
+    public String getTechnicalDetails() {
+    return technicalDetails;
+    }
+
+public void setTechnicalDetails(String technicalDetails) {
+    this.technicalDetails = technicalDetails;
+    }
+
+    public String getReference() {
+    return reference;
+    }
+
+public void setReference(String reference) {
+    this.reference = reference;
+    }
+
+    public Double getOfferPrice() {
+    return offerPrice;
+}
+
+public void setOfferPrice(Double offerPrice) {
+    this.offerPrice = offerPrice;
+}
+
+public int getAvailableStock() {
+    return availableStock;
+}
+
+public void setAvailableStock(int availableStock) {
+    this.availableStock = availableStock;
+}
 }

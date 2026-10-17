@@ -105,6 +105,14 @@ function ProductoDetallePage() {
               </div>
 
               <div className="col-md-4">
+                <strong>Referencia:</strong>
+                <p>
+                  {producto.reference?.trim() ||
+                    "Sin referencia registrada"}
+                </p>
+              </div>
+
+              <div className="col-md-4">
                 <strong>Precio:</strong>
                 <p>
                   $
@@ -137,6 +145,25 @@ function ProductoDetallePage() {
                 <p className="mb-0">
                   {producto.description ||
                     "Sin descripción"}
+                </p>
+              </div>
+
+              <div className="col-12">
+                <strong>Características técnicas:</strong>
+
+                <p
+                  className="mt-2 mb-0"
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    overflowWrap: "anywhere",
+                    maxHeight: "240px",
+                    overflowY: "auto",
+                    fontSize: "14px",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {producto.technicalDetails?.trim() ||
+                    "Sin características técnicas registradas"}
                 </p>
               </div>
             </div>

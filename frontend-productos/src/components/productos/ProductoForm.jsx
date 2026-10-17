@@ -3,8 +3,11 @@ import { useState } from "react";
 const valoresVacios = {
   productId: "",
   name: "",
+  reference: "",
   description: "",
+  technicalDetails: "",
   price: "",
+  offerPrice: "",
   stock: "",
   image: "",
   categoryId: "",
@@ -23,8 +26,11 @@ function ProductoForm({
   const [formulario, setFormulario] = useState({
     productId: productoInicial.productId ?? "",
     name: productoInicial.name ?? "",
+    reference: productoInicial.reference ?? "",
     description: productoInicial.description ?? "",
+    technicalDetails: productoInicial.technicalDetails ?? "",
     price: productoInicial.price ?? "",
+    offerPrice: productoInicial.offerPrice ?? "",
     stock: productoInicial.stock ?? "",
     image: productoInicial.image ?? "",
     categoryId: productoInicial.categoryId ?? "",
@@ -66,10 +72,10 @@ function ProductoForm({
 
     if (
       formulario.price === "" ||
-      Number(formulario.price) < 0
+      Number(formulario.price) <= 0
     ) {
       nuevosErrores.price =
-        "El precio debe ser mayor o igual que cero.";
+        "El precio debe ser mayor que cero.";
     }
 
     if (
@@ -95,6 +101,34 @@ function ProductoForm({
         "La categoría debe ser un número entero mayor que cero.";
     }
 
+    if (formulario.technicalDetails.trim().length > 3000) {
+  nuevosErrores.technicalDetails =
+    "Las características técnicas admiten máximo 3000 caracteres.";
+    }
+
+    if (formulario.reference.trim().length > 50) {
+  nuevosErrores.reference =
+    "La referencia admite máximo 50 caracteres.";
+    }
+
+    if (formulario.offerPrice !== "") {
+      const oferta = Number(formulario.offerPrice);
+      const precioNormal = Number(formulario.price);
+
+      if (!Number.isFinite(oferta) || oferta <= 0) {
+        nuevosErrores.offerPrice =
+          "El precio de oferta debe ser mayor que cero.";
+      } else if (oferta >= precioNormal) {
+        nuevosErrores.offerPrice =
+          "El precio de oferta debe ser menor que el precio normal.";
+      } else if (
+        Math.abs(oferta * 100 - Math.round(oferta * 100)) > 0.000001
+      ) {
+        nuevosErrores.offerPrice =
+          "El precio de oferta admite máximo dos decimales.";
+      }
+    }
+
     setErrores(nuevosErrores);
 
     return Object.keys(nuevosErrores).length === 0;
@@ -110,8 +144,13 @@ function ProductoForm({
     const producto = {
       productId: Number(formulario.productId),
       name: formulario.name.trim(),
+      reference: formulario.reference.trim(),
       description: formulario.description.trim(),
+      technicalDetails: formulario.technicalDetails.trim(),
       price: Number(formulario.price),
+      offerPrice: formulario.offerPrice === ""
+      ? null
+      : Number(formulario.offerPrice),
       stock: Number(formulario.stock),
       image: formulario.image.trim(),
       categoryId: Number(formulario.categoryId),
@@ -170,6 +209,32 @@ function ProductoForm({
           </div>
         </div>
 
+            <div className="col-12">
+      <label htmlFor="reference" className="form-label">
+        Referencia
+      </label>
+
+      <input
+        id="reference"
+        name="reference"
+        type="text"
+        maxLength={50}
+        className={`form-control ${
+          errores.reference ? "is-invalid" : ""
+        }`}
+        value={formulario.reference}
+        onChange={manejarCambio}
+      />
+
+      <div className="invalid-feedback">
+        {errores.reference}
+      </div>
+
+      <div className="form-text">
+        Código de referencia del producto. Opcional y único.
+      </div>
+    </div>
+
         <div className="col-12">
           <label
             htmlFor="description"
@@ -182,9 +247,46 @@ function ProductoForm({
             name="description"
             className="form-control"
             rows="3"
+            maxLength="1000"
             value={formulario.description}
             onChange={manejarCambio}
           />
+        </div>
+
+        <div className="col-12">
+          <label
+            htmlFor="technicalDetails"
+            className="form-label"
+          >
+            Características técnicas
+          </label>
+
+          <textarea
+          id="technicalDetails"
+          name="technicalDetails"
+          className={`form-control ${
+            errores.technicalDetails ? "is-invalid" : ""
+          }`}
+          rows="5"
+          maxLength={3000}
+          value={formulario.technicalDetails}
+          onChange={manejarCambio}
+          aria-describedby="ayudaCaracteristicas errorCaracteristicas"
+          aria-invalid={Boolean(errores.technicalDetails)}
+        />
+
+        <div
+          id="errorCaracteristicas"
+          className="invalid-feedback"
+        >
+          {errores.technicalDetails}
+        </div>
+
+        <div id="ayudaCaracteristicas" className="form-text">
+          Campo opcional. Escribe material, dimensiones, peso
+          y funciones, una característica por línea.
+          Máximo 3000 caracteres.
+          </div>
         </div>
 
         <div className="col-md-4">
@@ -198,7 +300,7 @@ function ProductoForm({
             id="price"
             name="price"
             type="number"
-            min="0"
+            min="0.01"
             step="0.01"
             className={`form-control ${
               errores.price ? "is-invalid" : ""
@@ -210,6 +312,37 @@ function ProductoForm({
             {errores.price}
           </div>
         </div>
+
+        <div className="col-md-4">
+        <label htmlFor="offerPrice" className="form-label">
+          Precio de oferta
+        </label>
+
+        <input
+          id="offerPrice"
+          name="offerPrice"
+          type="number"
+          min="0.01"
+          step="0.01"
+          className={`form-control ${
+            errores.offerPrice ? "is-invalid" : ""
+          }`}
+          value={formulario.offerPrice}
+          onChange={manejarCambio}
+          placeholder="Sin oferta"
+          aria-describedby="errorOferta ayudaOferta"
+          aria-invalid={Boolean(errores.offerPrice)}
+        />
+
+        <div id="errorOferta" className="invalid-feedback">
+          {errores.offerPrice}
+        </div>
+
+        <div id="ayudaOferta" className="form-text">
+          Opcional. Déjalo vacío para quitar la oferta.
+          Debe ser menor que el precio normal.
+        </div>
+      </div>
 
         <div className="col-md-4">
           <label

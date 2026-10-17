@@ -7,12 +7,14 @@ import java.sql.SQLException;
 public class Conexion {
 
     private static final String URL =
+            config.ServidorConfig.entorno("SWISSCOL_DB_URL",
             "jdbc:mysql://localhost:3306/database_swisscol"
             + "?useSSL=false"
             + "&serverTimezone=America/Bogota"
-            + "&allowPublicKeyRetrieval=true";
+            + "&allowPublicKeyRetrieval=true");
 
-    private static final String USER = "root";
+    private static final String USER =
+        config.ServidorConfig.entorno("SWISSCOL_DB_USER", "root");
     private static final String PASSWORD =
         System.getenv("SWISSCOL_DB_PASSWORD");
 
