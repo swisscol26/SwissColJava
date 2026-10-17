@@ -180,8 +180,8 @@ public final class NotificacionController {
             .getRequestHeaders()
             .getFirst("Origin");
 
-        if (origen == null
-                || !ORIGENES_PERMITIDOS.contains(origen)) {
+        if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
             responderError(
                 exchange,
@@ -191,10 +191,9 @@ public final class NotificacionController {
             return false;
         }
 
-        exchange.getResponseHeaders().set(
-            "Access-Control-Allow-Origin",
-            origen
-        );
+        if (origen != null) {
+            exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+        }
 
         exchange.getResponseHeaders().set(
             "Access-Control-Allow-Credentials",

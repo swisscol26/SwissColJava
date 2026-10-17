@@ -39,8 +39,8 @@ public final class PedidoController {
             .getRequestHeaders()
             .getFirst("Origin");
 
-        if (origen == null
-                || !ORIGENES_PERMITIDOS.contains(origen)) {
+        if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
             responderError(
                 exchange,
@@ -50,10 +50,9 @@ public final class PedidoController {
             return;
         }
 
-        exchange.getResponseHeaders().set(
-            "Access-Control-Allow-Origin",
-            origen
-        );
+        if (origen != null) {
+            exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+        }
 
         exchange.getResponseHeaders().set(
             "Access-Control-Allow-Credentials",
@@ -258,8 +257,8 @@ public final class PedidoController {
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -269,10 +268,9 @@ public final class PedidoController {
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin",
-        origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
 
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials",
@@ -345,8 +343,8 @@ public static void confirmar(
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -356,10 +354,9 @@ public static void confirmar(
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin",
-        origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
 
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials",
@@ -491,8 +488,8 @@ public static void listarPendientes(
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -502,10 +499,9 @@ public static void listarPendientes(
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin",
-        origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
 
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials",
@@ -578,8 +574,8 @@ public static void consultarEstadisticas(
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -589,10 +585,9 @@ public static void consultarEstadisticas(
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin",
-        origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
 
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials",
@@ -669,8 +664,8 @@ public static void actualizarCostoEnvio(
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -680,9 +675,9 @@ public static void actualizarCostoEnvio(
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin", origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials", "true"
     );
@@ -819,8 +814,8 @@ public static void aprobarParaPago(
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -830,9 +825,9 @@ public static void aprobarParaPago(
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin", origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials", "true"
     );
@@ -976,8 +971,8 @@ public static void reportarPago(
         .getRequestHeaders()
         .getFirst("Origin");
 
-    if (origen == null
-            || !ORIGENES_PERMITIDOS.contains(origen)) {
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
 
         responderError(
             exchange,
@@ -987,9 +982,9 @@ public static void reportarPago(
         return;
     }
 
-    exchange.getResponseHeaders().set(
-        "Access-Control-Allow-Origin", origen
-    );
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
     exchange.getResponseHeaders().set(
         "Access-Control-Allow-Credentials", "true"
     );
