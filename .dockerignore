@@ -1,0 +1,15 @@
+**
+!Dockerfile
+!src/
+!src/**
+!lib/
+!lib/*.jar
+!frontend-productos/
+!frontend-productos/package.json
+!frontend-productos/package-lock.json
+!frontend-productos/index.html
+!frontend-productos/vite.config.js
+!frontend-productos/src/
+!frontend-productos/src/**
+!frontend-productos/public/
+!frontend-productos/public/**

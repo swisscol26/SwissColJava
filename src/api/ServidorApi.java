@@ -33,6 +33,11 @@ public class ServidorApi {
         NotificacionRoutes.registrar(servidor);
         PagoRoutes.registrar(servidor);
 
+        String webRoot = config.ServidorConfig.entorno("SWISSCOL_WEB_ROOT", "");
+        if (!webRoot.isEmpty()) {
+            servidor.createContext("/", new ArchivosWeb(java.nio.file.Path.of(webRoot)));
+        }
+
         servidor.setExecutor(null);
         servidor.start();
 

@@ -11,7 +11,7 @@ import NuevoProductoPage from "./pages/productos/NuevoProductoPage";
 import ProductoDetallePage from "./pages/productos/ProductoDetallePage";
 import ProductosPage from "./pages/productos/ProductosPage";
 import PedidosPage from "./pages/pedidos/PedidosPage";
-import EstadisticasPage from "./pages/estadisticas/EstadisticasPage";
+import EstadisticasPage from "./pages/Estadisticas/EstadisticasPage";
 
 function App() {
     return (
