@@ -11,6 +11,16 @@ import java.sql.Statement;
 
 public class UsuarioDAO {
 
+    public boolean cambiarPassword(int id, String anterior, String nuevo) throws SQLException {
+        try (Connection c = Conexion.conectar(); PreparedStatement ps = c.prepareStatement(
+                "UPDATE users SET password = ? WHERE user_id = ? AND password = ?")) {
+            ps.setString(1, nuevo);
+            ps.setInt(2, id);
+            ps.setString(3, anterior);
+            return ps.executeUpdate() == 1;
+        }
+    }
+
     /**
      * Busca un usuario por su correo electrónico.
      */

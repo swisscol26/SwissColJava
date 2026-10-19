@@ -16,6 +16,9 @@ public final class AuthRoutes {
      */
     public static void registrar(HttpServer servidor) {
 
+        servidor.createContext("/api/auth/recuperar", controllers.RecuperacionController::atender);
+        servidor.createContext("/api/auth/restablecer", controllers.RecuperacionController::atender);
+
         servidor.createContext(
             "/api/auth/registro",
             AuthController::registrar

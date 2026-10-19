@@ -65,4 +65,8 @@ public final class GestorSesiones {
             sesiones.remove(token);
         }
     }
+
+    public static void cerrarSesionesUsuario(int usuarioId) {
+        sesiones.entrySet().removeIf(e -> e.getValue().getUsuarioId() == usuarioId);
+    }
 }
