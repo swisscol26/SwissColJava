@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import "./PedidosPage.css";
 import pedidoService from "../../services/pedidoService";
 
 function PedidosPage() {
@@ -252,7 +253,7 @@ function PedidosPage() {
     }
 
     return (
-        <main className="container py-4">
+        <main className="container py-4 pedidos-page">
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
                 <h1>Pedidos pendientes</h1>
 
@@ -296,9 +297,15 @@ function PedidosPage() {
             )}
 
             {!cargando && pedidos.map(pedido => (
-                <article className="card mb-4" key={pedido.pedidoId}>
+                <article className="card mb-4 pedido-card" key={pedido.pedidoId}>
                     <div className="card-body">
-                        <h2 className="h4">Pedido #{pedido.pedidoId}</h2>
+                        <div className="pedido-heading">
+                            <h2 className="h4">Pedido #{pedido.pedidoId}</h2>
+                            <span className={`pedido-estado pedido-estado--${pedido.estado.toLowerCase()}`}>
+                                {({ PENDIENTE: "Pendiente de revisión", PENDIENTE_PAGO: "Esperando pago", PAGO_POR_VERIFICAR: "Pago por verificar" })[pedido.estado] || pedido.estado}
+                            </span>
+                        </div>
+                        <div className="pedido-cliente">
 
                         <p className="mb-1">
                             <strong>Cliente:</strong> {pedido.nombreCliente}
@@ -312,11 +319,9 @@ function PedidosPage() {
                             <strong>Fecha:</strong> {pedido.fecha}
                         </p>
 
-                        <p>
-                            <strong>Estado:</strong> {pedido.estado}
-                        </p>
+                        </div>
 
-                        <div className="border rounded p-3 mb-3 bg-light">
+                        <div className="pedido-envio">
     <h3 className="h5 mb-3">Datos de envío</h3>
 
     {pedido.direccion ? (
@@ -368,15 +373,15 @@ function PedidosPage() {
     )}
 </div>
 
-                        <ul className="list-group mb-3">
+                        <ul className="list-group mb-3 pedido-productos">
                             {pedido.productos.map(producto => (
                                 <li
                                     className="list-group-item"
                                     key={producto.productoId}
                                 >
-                                    {producto.nombre} — Cantidad:{" "}
-                                    {producto.cantidad} — Precio unitario:{" "}
-                                    {formatoPrecio(producto.precioUnitario)}
+                                    <strong>{producto.nombre}</strong>
+                                    <span>Cantidad: {producto.cantidad}</span>
+                                    <span>Precio unitario: {formatoPrecio(producto.precioUnitario)}</span>
                                 </li>
                             ))}
                         </ul>
@@ -386,7 +391,7 @@ function PedidosPage() {
                     </p>
 
                     <form
-                        className="border rounded p-3 mb-3"
+                        className="pedido-costo"
                         onSubmit={event =>
                             guardarCostoEnvio(event, pedido.pedidoId)
                         }
@@ -402,7 +407,7 @@ function PedidosPage() {
                             <input
                                 type="number"
                                 className="form-control"
-                                style={{ maxWidth: "240px" }}
+
                                 id={`costo-envio-${pedido.pedidoId}`}
                                 aria-describedby={`ayuda-envio-${pedido.pedidoId}`}
                                 min="0"
@@ -467,8 +472,9 @@ function PedidosPage() {
                             </p>
                         </form>
 
+                        <div className="pedido-acciones">
                         <button
-                            className="btn btn-outline-danger mb-3"
+                            className="btn btn-outline-danger"
                             disabled={procesando !== null || guardandoEnvio !== null}
                             onClick={() => cancelarSolicitud(pedido.pedidoId)}
                         >
@@ -540,6 +546,7 @@ function PedidosPage() {
                                 </button>
                             </div>
                         )}
+                        </div>
                     </div>
                 </article>
             ))}
