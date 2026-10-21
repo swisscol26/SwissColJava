@@ -20,6 +20,8 @@ public final class PedidoRoutes {
             PedidoController::listar
         );
 
+        servidor.createContext("/api/pedidos/cancelar", PedidoController::cancelarSolicitud);
+
         servidor.createContext(
             "/api/pedidos/confirmar",
             PedidoController::confirmar

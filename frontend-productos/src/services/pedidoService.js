@@ -9,6 +9,9 @@ const apiPedidos = axios.create({
 
 const pedidoService = {
 
+    cancelarSolicitud(pedidoId) {
+        return apiPedidos.post("/cancelar", { pedidoId });
+    },
     listarPendientes() {
         return apiPedidos.get("/pendientes");
     },

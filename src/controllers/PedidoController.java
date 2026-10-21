@@ -964,6 +964,163 @@ public static void aprobarParaPago(
     );
 }
 
+public static void cancelarSolicitud(
+        HttpExchange exchange) throws IOException {
+
+    String origen = exchange
+        .getRequestHeaders()
+        .getFirst("Origin");
+
+    if ((origen == null && !"GET".equals(exchange.getRequestMethod()))
+                || (origen != null && !ORIGENES_PERMITIDOS.contains(origen))) {
+
+        responderError(
+            exchange,
+            403,
+            "Origen de la solicitud no permitido."
+        );
+        return;
+    }
+
+    if (origen != null) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origen);
+    }
+    exchange.getResponseHeaders().set(
+        "Access-Control-Allow-Credentials", "true"
+    );
+    exchange.getResponseHeaders().set("Vary", "Origin");
+    exchange.getResponseHeaders().set(
+        "Cache-Control", "no-store"
+    );
+    exchange.getResponseHeaders().set(
+        "Access-Control-Allow-Methods", "POST, OPTIONS"
+    );
+    exchange.getResponseHeaders().set(
+        "Access-Control-Allow-Headers", "Content-Type"
+    );
+
+    if (!"/api/pedidos/cancelar".equals(
+            exchange.getRequestURI().getPath())) {
+
+        responderError(exchange, 404, "Ruta no encontrada.");
+        return;
+    }
+
+    if ("OPTIONS".equalsIgnoreCase(
+            exchange.getRequestMethod())) {
+
+        exchange.sendResponseHeaders(204, -1);
+        exchange.close();
+        return;
+    }
+
+    if (!"POST".equalsIgnoreCase(
+            exchange.getRequestMethod())) {
+
+        exchange.getResponseHeaders().set(
+            "Allow", "POST, OPTIONS"
+        );
+
+        responderError(exchange, 405, "Método no permitido.");
+        return;
+    }
+
+    String tipoContenido = exchange
+        .getRequestHeaders()
+        .getFirst("Content-Type");
+
+    if (tipoContenido == null
+            || !tipoContenido.split(";", 2)[0]
+                .trim()
+                .equalsIgnoreCase("application/json")) {
+
+        responderError(
+            exchange,
+            415,
+            "Debes enviar la solicitud en formato JSON."
+        );
+        return;
+    }
+
+    byte[] contenido = exchange
+        .getRequestBody()
+        .readNBytes(4097);
+
+    if (contenido.length > 4096) {
+        responderError(
+            exchange,
+            413,
+            "La solicitud es demasiado grande."
+        );
+        return;
+    }
+
+    try {
+        ConfirmarPedidoSolicitud solicitud = gson.fromJson(
+            new String(contenido, StandardCharsets.UTF_8),
+            ConfirmarPedidoSolicitud.class
+        );
+
+        if (solicitud == null || solicitud.getPedidoId() <= 0) {
+            throw new IllegalArgumentException(
+                "Debes indicar un número de pedido válido."
+            );
+        }
+
+        pedidoService.cancelarSolicitud(
+            obtenerTokenSesion(exchange),
+            solicitud.getPedidoId()
+        );
+
+    } catch (AccesoException e) {
+        responderError(
+            exchange,
+            e.getCodigoHttp(),
+            e.getMessage()
+        );
+        return;
+
+    } catch (JsonParseException e) {
+        responderError(
+            exchange,
+            400,
+            "El contenido JSON no es válido."
+        );
+        return;
+
+    } catch (IllegalArgumentException e) {
+        responderError(exchange, 400, e.getMessage());
+        return;
+
+    } catch (IllegalStateException e) {
+        responderError(exchange, 409, e.getMessage());
+        return;
+
+    } catch (Exception e) {
+        System.err.println(
+            "Error al cancelar la solicitud: "
+                + e.getClass().getSimpleName()
+        );
+
+        responderError(
+            exchange,
+            500,
+            "No fue posible cancelar la solicitud."
+        );
+        return;
+    }
+
+    responder(
+        exchange,
+        200,
+        Map.of(
+            "exito", true,
+            "mensaje",
+            "Solicitud cancelada. Se liberaron sus reservas de inventario."
+        )
+    );
+}
+
 public static void reportarPago(
         HttpExchange exchange) throws IOException {
 

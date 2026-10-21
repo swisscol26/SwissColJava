@@ -86,6 +86,44 @@ function PedidosPage() {
         }
     }
 
+    async function cancelarSolicitud(pedidoId) {
+        if (confirmacionEnCurso.current) return;
+
+        const aceptado = window.confirm(
+            `¿Cancelar la solicitud #${pedidoId}? ` +
+            "Se retirará de pendientes y se liberarán sus reservas. El historial se conservará. " +
+            "Si reportaron un pago, verifica primero que sea una solicitud de prueba o resuelve el pago con el cliente. Esta acción no realiza reembolsos."
+        );
+
+        if (!aceptado) return;
+
+        confirmacionEnCurso.current = true;
+        setProcesando(pedidoId);
+        setError("");
+        setMensaje("");
+
+        try {
+            await pedidoService.cancelarSolicitud(pedidoId);
+
+            setPedidos(actuales =>
+                actuales.filter(pedido => pedido.pedidoId !== pedidoId)
+            );
+
+            setMensaje(
+                `Solicitud #${pedidoId} cancelada. Reservas liberadas.`
+            );
+        } catch (fallo) {
+            setError(
+                fallo.response?.data?.mensaje
+                || "No se pudo comprobar el resultado. " +
+                   "Actualiza la lista antes de volver a intentarlo."
+            );
+        } finally {
+            confirmacionEnCurso.current = false;
+            setProcesando(null);
+        }
+    }
+
     async function aprobarParaPago(pedidoId) {
     if (confirmacionEnCurso.current) return;
 
@@ -428,6 +466,14 @@ function PedidosPage() {
                                     )}
                             </p>
                         </form>
+
+                        <button
+                            className="btn btn-outline-danger mb-3"
+                            disabled={procesando !== null || guardandoEnvio !== null}
+                            onClick={() => cancelarSolicitud(pedido.pedidoId)}
+                        >
+                            Cancelar solicitud
+                        </button>
 
                         {pedido.estado === "PENDIENTE" && (
                             <button

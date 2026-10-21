@@ -67,7 +67,7 @@ public class PedidoPagoIntegracionPrueba {
                 ejecutar(c, "INSERT INTO product(product_id,name,price,stock,category_id) VALUES(?,?,?,?,?)",
                     producto, "PRUEBA PAGO " + marca.substring(0, 8), new BigDecimal("10000.25"), 10, categoria);
                 productoCreado = true;
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 6; i++) {
                     int pedido = insertar(c, "INSERT INTO orders(date,state,users_id,shipping_address,shipping_cost) VALUES(CURRENT_DATE,'PENDIENTE',?,?,?)",
                         cliente, "Dirección sintética de prueba", new BigDecimal("5000.25"));
                     pedidos.add(pedido);
@@ -123,6 +123,38 @@ public class PedidoPagoIntegracionPrueba {
                 comprobar(dao.liberarReservaVencida(vencido), "Libera reserva vencida");
                 inventario(c, producto, 8, 0);
                 comprobar(!dao.liberarReservaVencida(vencido), "Liberación idempotente");
+                rechazo = false;
+                try { servicio.cancelarSolicitud(null, pedidos.get(2)); }
+                catch (seguridad.AccesoException e) { rechazo = e.getCodigoHttp() == 401; }
+                comprobar(rechazo, "Sin sesión no puede cancelar");
+                rechazo = false;
+                try { servicio.cancelarSolicitud(tokenCliente, pedidos.get(2)); }
+                catch (seguridad.AccesoException e) { rechazo = e.getCodigoHttp() == 403; }
+                comprobar(rechazo, "Cliente no puede cancelar");
+                rechazo = false;
+                try { dao.cancelarSolicitud(pedido); } catch (IllegalStateException e) { rechazo = true; }
+                comprobar(rechazo, "No cancela un pedido confirmado");
+                for (int i = 2; i < 5; i++) {
+                    int cancelar = pedidos.get(i);
+                    if (i >= 3) dao.aprobarParaPago(cancelar);
+                    if (i == 4) dao.reportarPago(cliente, cancelar, "PRUEBA-CANCELACION");
+                    servicio.cancelarSolicitud(tokenAdmin, cancelar);
+                    inventario(c, producto, 8, 0);
+                    comprobar(!dao.cancelarSolicitud(cancelar), "Cancelación repetida no libera dos veces");
+                    comprobar(dao.listarPorUsuario(cliente).stream().anyMatch(p -> p.getPedidoId() == cancelar
+                        && "CANCELADO".equals(p.getEstado())), "Conserva historial cancelado");
+                    comprobar(dao.listarPendientes().stream().noneMatch(p -> p.getPedidoId() == cancelar),
+                        "Cancelado desaparece de pendientes");
+                }
+                int inconsistente = pedidos.get(5);
+                dao.aprobarParaPago(inconsistente);
+                ejecutar(c, "UPDATE product SET reserved_stock=0 WHERE product_id=?", producto);
+                rechazo = false;
+                try { dao.cancelarSolicitud(inconsistente); } catch (IllegalStateException e) { rechazo = true; }
+                comprobar(rechazo, "Reserva inconsistente impide cancelar");
+                comprobar(dao.listarPorUsuario(cliente).stream().anyMatch(p -> p.getPedidoId() == inconsistente
+                    && "PENDIENTE_PAGO".equals(p.getEstado())), "Rollback conserva estado");
+                inventario(c, producto, 8, 0);
                 System.out.println("PedidoPagoIntegracion: " + comprobaciones + " comprobaciones aprobadas.");
             } finally {
                 GestorSesiones.cerrarSesion(tokenCliente);

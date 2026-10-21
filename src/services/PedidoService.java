@@ -467,6 +467,18 @@ public void aprobarParaPago(
 }
 
 
+public void cancelarSolicitud(String token, int pedidoId) throws SQLException {
+    int codigo = autorizacionService.comprobarAdministrador(token);
+    if (codigo != 200) {
+        throw new AccesoException(codigo == 401 ? 401 : 403,
+            codigo == 401 ? "Debes iniciar sesión." : "Solo el administrador puede cancelar solicitudes.");
+    }
+    if (pedidoDAO.cancelarSolicitud(pedidoId)) {
+        crearNotificacionSegura(pedidoId,
+            "La solicitud #" + pedidoId + " fue cancelada por el administrador.", "PEDIDO");
+    }
+}
+
 private void crearNotificacionSegura(
         int pedidoId,
         String mensaje,

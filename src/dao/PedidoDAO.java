@@ -1074,6 +1074,153 @@ public BigDecimal aprobarParaPago(int pedidoId) throws SQLException {
     }
 }
 
+public boolean cancelarSolicitud(
+        int pedidoId) throws SQLException {
+
+    if (pedidoId <= 0) {
+        throw new IllegalArgumentException(
+            "El número del pedido no es válido."
+        );
+    }
+
+    try (Connection conexion = Conexion.conectar()) {
+
+        conexion.setAutoCommit(false);
+
+        try {
+            boolean tieneReserva;
+            String consultarPedido = """
+                SELECT state
+                FROM orders
+                WHERE order_id = ?
+                FOR UPDATE
+                """;
+
+            try (PreparedStatement consulta =
+                    conexion.prepareStatement(consultarPedido)) {
+
+                consulta.setInt(1, pedidoId);
+
+                try (ResultSet pedido = consulta.executeQuery()) {
+
+                    if (!pedido.next()) {
+                        throw new IllegalArgumentException(
+                            "El pedido no existe."
+                        );
+                    }
+
+                    String estado = pedido.getString("state");
+                    if ("CANCELADO".equals(estado)) {
+                        conexion.rollback();
+                        return false;
+                    }
+                    if (estado == null || !java.util.Set.of("PENDIENTE", "PENDIENTE_PAGO", "PAGO_POR_VERIFICAR").contains(estado)) {
+                        throw new IllegalStateException("Solo se pueden cancelar solicitudes pendientes. Los pedidos confirmados no se pueden cancelar aquí.");
+                    }
+                    tieneReserva = !"PENDIENTE".equals(estado);
+                }
+            }
+
+            if (tieneReserva) {
+                String consultarDetalles = """
+                    SELECT product_id, quantity
+                    FROM order_detail
+                    WHERE order_id = ?
+                    ORDER BY product_id, detail_id
+                    FOR UPDATE
+                    """;
+
+                String liberarStock = """
+                    UPDATE product
+                    SET reserved_stock = reserved_stock - ?
+                    WHERE product_id = ?
+                      AND reserved_stock >= ?
+                    """;
+
+                int cantidadDetalles = 0;
+
+                try (
+                    PreparedStatement detalles =
+                        conexion.prepareStatement(consultarDetalles);
+
+                    PreparedStatement liberacion =
+                        conexion.prepareStatement(liberarStock)
+                ) {
+
+                    detalles.setInt(1, pedidoId);
+
+                    try (ResultSet filas = detalles.executeQuery()) {
+
+                        while (filas.next()) {
+                            int productoId = filas.getInt("product_id");
+                            int cantidad = filas.getInt("quantity");
+
+                            if (cantidad <= 0) {
+                                throw new IllegalStateException(
+                                    "El pedido contiene una cantidad inválida."
+                                );
+                            }
+
+                            liberacion.setInt(1, cantidad);
+                            liberacion.setInt(2, productoId);
+                            liberacion.setInt(3, cantidad);
+
+                            if (liberacion.executeUpdate() != 1) {
+                                throw new IllegalStateException(
+                                    "No se pudo liberar la reserva del producto "
+                                        + productoId + "."
+                                );
+                            }
+
+                            cantidadDetalles++;
+                        }
+                    }
+                }
+
+                if (cantidadDetalles == 0) {
+                    throw new IllegalStateException(
+                        "El pedido no contiene productos."
+                    );
+                }
+
+            }
+
+            String actualizarPedido = """
+                UPDATE orders
+                SET state = 'CANCELADO',
+                    reservation_expires_at = NULL
+                WHERE order_id = ?
+                  AND state IN ('PENDIENTE', 'PENDIENTE_PAGO', 'PAGO_POR_VERIFICAR')
+                """;
+
+            try (PreparedStatement actualizacion =
+                    conexion.prepareStatement(actualizarPedido)) {
+
+                actualizacion.setInt(1, pedidoId);
+
+                if (actualizacion.executeUpdate() != 1) {
+                    throw new IllegalStateException(
+                        "No fue posible cancelar la solicitud."
+                    );
+                }
+            }
+
+            conexion.commit();
+            return true;
+
+        } catch (SQLException | RuntimeException e) {
+
+            try {
+                conexion.rollback();
+            } catch (SQLException falloRollback) {
+                e.addSuppressed(falloRollback);
+            }
+
+            throw e;
+        }
+    }
+}
+
 public boolean liberarReservaVencida(
         int pedidoId) throws SQLException {
 
