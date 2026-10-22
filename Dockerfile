@@ -10,7 +10,7 @@ FROM alpine/git:latest AS tienda
 WORKDIR /tienda
 # Version fija del repositorio publico: actualizar al publicar cambios de la tienda.
 RUN git init && git remote add origin https://github.com/swisscol26/Swisscol-2026.git \
-    && git fetch --depth 1 origin 0e47711c2bcaf22204c7f34fc4fcb2afd305876b \
+    && git fetch --depth 1 origin 1574cd9e59c6f5e8595c6a1a3c6c86b2661785ef \
     && git checkout --detach FETCH_HEAD
 
 FROM eclipse-temurin:21-jdk-jammy AS java

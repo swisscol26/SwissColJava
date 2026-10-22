@@ -53,6 +53,10 @@ public final class AuthValidator {
             return "La contraseña es obligatoria.";
         }
 
+        if (password.length() > 128) {
+            return "La contraseña admite máximo 128 caracteres.";
+        }
+
         if (password.length() < 8) {
             return "La contraseña debe tener mínimo 8 caracteres.";
         }
@@ -97,6 +101,10 @@ public final class AuthValidator {
         if (solicitud.getPassword() == null
                 || solicitud.getPassword().isBlank()) {
             return "La contraseña es obligatoria.";
+        }
+
+        if (solicitud.getPassword().length() > 128) {
+            return "La contraseña admite máximo 128 caracteres.";
         }
 
         return null;
